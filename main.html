@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ADMACCOUNT</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      position: relative;
+      background: #f0f0f0;
+      overflow: hidden;
+    }
+    #wrapper {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transition: transform 0.3s ease;
+      white-space: nowrap;
+    }
+    button {
+      padding: 15px 16px;
+      font-size: 12px;
+      font-weight: 900;
+      color: white;
+      background: linear-gradient(45deg, #ff4500, #ff8c00);
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 60px rgba(255, 69, 0, 0.8);
+      animation: pulse 2s infinite;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      max-width: 450px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 69, 0, 0.7);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 20px 10px rgba(255, 69, 0, 0);
+        transform: scale(1.05);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 69, 0, 0.7);
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="wrapper">
+    <button id="trickyButton">You want a adm account? click here</button>
+  </div>
+
+  <script>
+    const wrapper = document.getElementById('wrapper');
+    const button = document.getElementById('trickyButton');
+    const texts = [
+      "You want a adm account? click here",
+      "You want a adm account? click here",
+      "Did you check my CES ?",
+      "Oups you have no access to jira sem",
+      "Your sem is under validation pls waiting...",
+      "Cedric you have to valide a SEM ????",
+      "HAHA catch me if you can"
+    ];
+
+    function getMaxButtonWidth() {
+      let maxWidth = 0;
+      const tmp = document.createElement('button');
+      tmp.style.padding = '15px 16px';
+      tmp.style.fontSize = '12px';
+      tmp.style.fontWeight = '900';
+      tmp.style.position = 'absolute';
+      tmp.style.visibility = 'hidden';
+      tmp.style.whiteSpace = 'nowrap';
+      document.body.appendChild(tmp);
+      for (const text of texts) {
+        tmp.textContent = text;
+        const w = tmp.offsetWidth;
+        if (w > maxWidth) maxWidth = w;
+      }
+      document.body.removeChild(tmp);
+      return maxWidth;
+    }
+
+    const maxButtonWidth = getMaxButtonWidth();
+
+    let currentX = (window.innerWidth - maxButtonWidth) / 2;
+    let currentY = (window.innerHeight - wrapper.offsetHeight) / 2;
+    wrapper.style.transform = `translate(${currentX}px, ${currentY}px)`;
+
+    let isMoving = false;
+    let currentIndex = 0;
+
+    function distance(x1, y1, x2, y2) {
+      return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    document.body.addEventListener('mousemove', (e) => {
+      if (isMoving) return;
+
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      const offset = 150;
+      const minDistanceFromCurrent = 500; 
+
+      const rect = wrapper.getBoundingClientRect();
+
+      if (
+        mouseX > rect.left - offset &&
+        mouseX < rect.right + offset &&
+        mouseY > rect.top - offset &&
+        mouseY < rect.bottom + offset
+      ) {
+        isMoving = true;
+
+        let newX, newY;
+        do {
+          const maxX = window.innerWidth - maxButtonWidth;
+          const maxY = window.innerHeight - wrapper.offsetHeight;
+
+          newX = Math.random() * maxX;
+          newY = Math.random() * maxY;
+
+          newX = clamp(newX, 0, maxX);
+          newY = clamp(newY, 0, maxY);
+
+        } while (
+          distance(newX, newY, currentX, currentY) < minDistanceFromCurrent
+        );
+
+        currentX = newX;
+        currentY = newY;
+
+        wrapper.style.transform = `translate(${newX}px, ${newY}px)`;
+      }
+    });
+
+    wrapper.addEventListener('transitionend', () => {
+      button.textContent = texts[currentIndex];
+      currentIndex = (currentIndex + 1) % texts.length;
+      isMoving = false;
+    });
+  </script>
+</body>
+</html>
